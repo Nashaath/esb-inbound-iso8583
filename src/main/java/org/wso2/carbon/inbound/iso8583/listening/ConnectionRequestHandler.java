@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.inbound.iso8583.listening;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -39,11 +40,12 @@ public class ConnectionRequestHandler implements Runnable {
     private ISO8583MessageInject msgInject;
     private DataInputStream inputStreamReader;
     private DataOutputStream outToClient;
+    private byte[] array;
 
     public ConnectionRequestHandler(Socket connection, InboundProcessorParams params) {
         try {
             this.connection = connection;
-            this.packager = ISO8583PackagerFactory.getPackager();
+            this.packager = ISO8583PackagerFactory.getPackagerWithParams(params);
             this.msgInject = new ISO8583MessageInject(params, connection);
             this.inputStreamReader = new DataInputStream(connection.getInputStream());
             this.outToClient = new DataOutputStream(connection.getOutputStream());
@@ -57,7 +59,9 @@ public class ConnectionRequestHandler implements Runnable {
      */
     public void connect() throws IOException {
         if (connection.isConnected()) {
-            String fromClient = inputStreamReader.readUTF();
+            array = IOUtils.toByteArray(inputStreamReader);
+            String fromClient = new String(array);
+            System.out.println("Requestcccccccccccccc msg ="+ fromClient);
             outToClient.writeBytes("ISOMessage from " + Thread.currentThread().getName() + " is consumed :");
             ISOMsg isoMessage = unpackRequest(fromClient);
             msgInject.inject(isoMessage);

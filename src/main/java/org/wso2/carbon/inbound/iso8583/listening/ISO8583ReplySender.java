@@ -89,12 +89,14 @@ public class ISO8583ReplySender implements InboundResponseSender {
                         properties.getProperty(ISO8583Constant.SUCCESSFUL_RESPONSE_CODE));
                 byte[] msg = isoMsg.pack();
                 responseMessage = new String(msg).toUpperCase();
+                System.out.println("responceMsggggggggg ="+ responseMessage);
             } else {
                 /* Set the code for invalid transaction response */
                 isoMsg.set(properties.getProperty(ISO8583Constant.RESPONSE_FIELD),
                         properties.getProperty(ISO8583Constant.FAILURE_RESPONSE_CODE));
                 byte[] msg = isoMsg.pack();
                 responseMessage = new String(msg).toUpperCase();
+                System.out.println("responceMsggggggggg ="+ responseMessage);
             }
         } catch (ISOException e) {
             handleException("Couldn't packed ISO8583 Messages", e);

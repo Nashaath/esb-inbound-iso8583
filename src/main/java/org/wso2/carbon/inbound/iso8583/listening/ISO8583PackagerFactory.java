@@ -19,9 +19,13 @@ package org.wso2.carbon.inbound.iso8583.listening;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.jpos.iso.ISOBasePackager;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOPackager;
 import org.jpos.iso.packager.GenericPackager;
+
+import java.util.Properties;
 
 /**
  * class for get ISOPackager.
@@ -37,6 +41,25 @@ public class ISO8583PackagerFactory {
         } catch (ISOException e) {
             handleException("Error while get the ISOPackager", e);
         }
+        return packager;
+    }
+
+    public static ISOBasePackager getPackagerWithParams(InboundProcessorParams params) {
+        GenericPackager packager = null;
+
+        try {
+            Properties properties = params.getProperties();
+            int headerLength = Integer.parseInt(properties.getProperty("headerLength"));
+            headerLength = headerLength > -1?headerLength:0;
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            packager = new GenericPackager(loader.getResourceAsStream("jposdef.xml"));
+            packager.setHeaderLength(headerLength);
+        } catch (NumberFormatException var5) {
+            handleException("One of the properties are of an invalid type", var5);
+        } catch (ISOException var6) {
+            handleException("Error while get the ISOPackager", var6);
+        }
+
         return packager;
     }
 
